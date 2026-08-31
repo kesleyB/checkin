@@ -3,7 +3,7 @@
  * Check-in never requires network; only import/sync URL does.
  */
 
-const CACHE_NAME = "church-concert-checkin-v2";
+const CACHE_NAME = "church-concert-checkin-v3";
 
 const PRECACHE_URLS = [
   "./",
