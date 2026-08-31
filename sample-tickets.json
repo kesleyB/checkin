@@ -1,0 +1,42 @@
+[
+  {
+    "ticketId": "CHC-AAAA11",
+    "orderId": "ORD-0001",
+    "buyerName": "Juan Dela Cruz",
+    "ticketType": "General Admission",
+    "status": "UNUSED",
+    "qrData": "CHC-AAAA11"
+  },
+  {
+    "ticketId": "CHC-BBBB22",
+    "orderId": "ORD-0002",
+    "buyerName": "Maria Santos",
+    "ticketType": "Sponsor",
+    "status": "UNUSED",
+    "qrData": "CHC-BBBB22"
+  },
+  {
+    "ticketId": "CHC-CCCC33",
+    "orderId": "ORD-0003",
+    "buyerName": "Pedro Reyes",
+    "ticketType": "General Admission",
+    "status": "UNUSED",
+    "qrData": "CHC-CCCC33"
+  },
+  {
+    "ticketId": "CHC-DDDD44",
+    "orderId": "ORD-0004",
+    "buyerName": "Ana Lopez",
+    "ticketType": "Sponsor",
+    "status": "UNUSED",
+    "qrData": "CHC-DDDD44"
+  },
+  {
+    "ticketId": "CHC-EEEE55",
+    "orderId": "ORD-0005",
+    "buyerName": "Carlos Mendoza",
+    "ticketType": "General Admission",
+    "status": "UNUSED",
+    "qrData": "CHC-EEEE55"
+  }
+]

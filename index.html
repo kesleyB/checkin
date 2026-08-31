@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0f766e" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Concert Check-In" />
+    <meta
+      name="description"
+      content="Offline QR ticket scanner for JCF Concert 2026"
+    />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" href="icons/icon-192.png" type="image/png" />
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>JCF Concert Check-In</title>
+  </head>
+  <body>
+    <div id="app">
+      <!-- DASHBOARD -->
+      <section id="view-dashboard" class="view view-active" aria-label="Dashboard">
+        <header class="dash-header">
+          <p class="brand">JCF CONCERT</p>
+          <h1 class="event-title">JCF CONCERT 2026</h1>
+          <div id="status-pill" class="status-pill status-online" role="status">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span id="status-text">ONLINE</span>
+          </div>
+        </header>
+
+        <div id="no-tickets-banner" class="banner warn hidden" role="alert">
+          No tickets loaded. Open Admin and import the ticket list before check-in.
+        </div>
+
+        <button type="button" id="btn-scan" class="btn btn-primary btn-xl">
+          SCAN TICKET
+        </button>
+
+        <div class="stats" id="stats-panel">
+          <div class="stat-row">
+            <span>Checked in</span>
+            <strong id="stat-checked-in">0</strong>
+          </div>
+          <div class="stat-row">
+            <span>Remaining</span>
+            <strong id="stat-remaining">0</strong>
+          </div>
+          <div class="stat-row">
+            <span>Total tickets</span>
+            <strong id="stat-total">0</strong>
+          </div>
+          <hr class="stat-divider" />
+          <div class="stat-row muted">
+            <span>General Admission</span>
+            <strong id="stat-general">0</strong>
+          </div>
+          <div class="stat-row muted">
+            <span>Sponsor</span>
+            <strong id="stat-sponsor">0</strong>
+          </div>
+          <hr class="stat-divider" />
+          <div class="stat-row muted">
+            <span>Pending upload</span>
+            <strong id="stat-pending">0</strong>
+          </div>
+        </div>
+
+        <p class="last-sync">
+          Last sync:<br />
+          <span id="last-sync-text">Never</span>
+        </p>
+
+        <nav class="dash-nav">
+          <button type="button" id="btn-manual" class="btn btn-ghost">
+            Manual Ticket ID
+          </button>
+          <button type="button" id="btn-admin" class="btn btn-ghost">Admin</button>
+        </nav>
+      </section>
+
+      <!-- SCANNER -->
+      <section id="view-scanner" class="view" aria-label="Scanner" hidden>
+        <header class="scanner-header">
+          <button type="button" id="btn-scanner-back" class="btn btn-ghost btn-sm">
+            ← Back
+          </button>
+          <h2>Scan Ticket</h2>
+        </header>
+
+        <div id="reader" class="reader"></div>
+
+        <p id="scanner-hint" class="hint">Point the camera at the ticket QR code.</p>
+
+        <div id="camera-error" class="banner warn hidden" role="alert"></div>
+
+        <div class="manual-inline">
+          <label for="manual-id-scan">Or enter Ticket ID</label>
+          <div class="input-row">
+            <input
+              type="text"
+              id="manual-id-scan"
+              class="input"
+              placeholder="CHC-XXXXXX"
+              autocomplete="off"
+              autocapitalize="characters"
+              spellcheck="false"
+            />
+            <button type="button" id="btn-manual-submit-scan" class="btn btn-secondary">
+              Check in
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESULT -->
+      <section id="view-result" class="view" aria-label="Result" hidden>
+        <div id="result-panel" class="result-panel">
+          <div id="result-icon" class="result-icon" aria-hidden="true">✓</div>
+          <h2 id="result-title" class="result-title">VALID TICKET</h2>
+          <p id="result-action" class="result-action">ADMIT THIS PERSON</p>
+
+          <div id="result-details" class="result-details">
+            <p id="result-name" class="result-name"></p>
+            <p id="result-type" class="result-type"></p>
+            <p id="result-id" class="result-id"></p>
+          </div>
+
+          <p id="result-message" class="result-message"></p>
+
+          <button type="button" id="btn-scan-next" class="btn btn-primary btn-xl">
+            SCAN NEXT
+          </button>
+        </div>
+      </section>
+
+      <!-- MANUAL SEARCH (standalone from dashboard) -->
+      <section id="view-manual" class="view" aria-label="Manual entry" hidden>
+        <header class="scanner-header">
+          <button type="button" id="btn-manual-back" class="btn btn-ghost btn-sm">
+            ← Back
+          </button>
+          <h2>Manual Ticket ID</h2>
+        </header>
+
+        <p class="hint">Type the Ticket ID from the printed ticket or backup list.</p>
+
+        <label for="manual-id" class="sr-only">Ticket ID</label>
+        <input
+          type="text"
+          id="manual-id"
+          class="input input-lg"
+          placeholder="CHC-XXXXXX"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+        />
+        <button type="button" id="btn-manual-submit" class="btn btn-primary btn-xl">
+          CHECK IN
+        </button>
+
+        <div id="manual-lookup" class="lookup-box hidden">
+          <p id="lookup-summary"></p>
+        </div>
+      </section>
+
+      <!-- ADMIN -->
+      <section id="view-admin" class="view" aria-label="Admin" hidden>
+        <header class="scanner-header">
+          <button type="button" id="btn-admin-back" class="btn btn-ghost btn-sm">
+            ← Back
+          </button>
+          <h2>Admin</h2>
+        </header>
+
+        <div class="admin-block">
+          <h3>Import tickets</h3>
+          <p class="hint">
+            Upload a JSON or CSV file of verified tickets. This replaces the local
+            database.
+          </p>
+          <input
+            type="file"
+            id="import-file"
+            accept=".json,.csv,application/json,text/csv"
+          />
+          <button type="button" id="btn-import-file" class="btn btn-secondary">
+            Import file
+          </button>
+          <p id="import-result" class="admin-msg" role="status"></p>
+        </div>
+
+        <div class="admin-block">
+          <h3>Google Sheets sync</h3>
+          <p class="hint">
+            Sync with the Tickets tab via your Apps Script Web App. Requires
+            internet. Uploads pending check-ins, then downloads latest tickets.
+          </p>
+          <label for="device-id">Device ID</label>
+          <input
+            type="text"
+            id="device-id"
+            class="input"
+            placeholder="VOLUNTEER-01"
+            autocomplete="off"
+          />
+          <label for="sync-url">Apps Script Web App URL</label>
+          <input
+            type="url"
+            id="sync-url"
+            class="input"
+            placeholder="https://script.google.com/macros/s/.../exec"
+          />
+          <button type="button" id="btn-sync-now" class="btn btn-primary">
+            Sync now
+          </button>
+          <button type="button" id="btn-sync-download" class="btn btn-secondary">
+            Download tickets only
+          </button>
+          <p id="sync-result" class="admin-msg" role="status"></p>
+        </div>
+
+        <div class="admin-block">
+          <h3>Export</h3>
+          <button type="button" id="btn-export-checkins-csv" class="btn btn-ghost">
+            Export check-ins (CSV)
+          </button>
+          <button type="button" id="btn-export-checkins-json" class="btn btn-ghost">
+            Export check-ins (JSON)
+          </button>
+          <button type="button" id="btn-export-backup-csv" class="btn btn-ghost">
+            Backup all tickets (CSV)
+          </button>
+          <button type="button" id="btn-export-backup-json" class="btn btn-ghost">
+            Backup all tickets (JSON)
+          </button>
+          <p id="export-result" class="admin-msg" role="status"></p>
+        </div>
+
+        <div class="admin-block danger-zone">
+          <h3>Danger zone</h3>
+          <button type="button" id="btn-clear-db" class="btn btn-danger">
+            Clear local database
+          </button>
+        </div>
+
+        <p class="hint tiny">
+          Multiple phones may both accept the same ticket while offline. The Google
+          Sheet decides the final state when check-ins sync.
+        </p>
+      </section>
+    </div>
+
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="db.js"></script>
+    <script src="sync.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
